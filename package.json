@@ -1,0 +1,13 @@
+{
+  "name": "ai-sales-intelligence-platform",
+  "version": "1.0.0",
+  "description": "Full-stack MERN AI-Powered Sales Intelligence Platform with Speech-to-Text, Sentiment Analysis, and Automated Action Items",
+  "scripts": {
+    "install:all": "npm.cmd --prefix backend install && npm.cmd --prefix frontend install",
+    "dev:backend": "node backend/src/server.js",
+    "dev:frontend": "npm.cmd --prefix frontend run dev"
+  },
+  "keywords": ["mern", "sales-intelligence", "ai", "whisper", "gemini", "sentiment-analysis"],
+  "author": "",
+  "license": "MIT"
+}
