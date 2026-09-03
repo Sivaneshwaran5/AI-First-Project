@@ -65,107 +65,62 @@ async function transcribeAudio(filePath, originalFilename = 'audio.mp3') {
  * Analyze Transcript using Gemini or OpenAI LLM to extract full sales intelligence JSON.
  */
 async function analyzeSalesTranscript({ transcriptText, clientCompany = 'Acme Corp', clientName = 'Decision Maker', dealStage = 'Demo' }) {
-  const prompt = `You are an elite Sales Intelligence AI. Analyze the following sales conversation transcript between a Sales Rep and a Prospect/Client at "${clientCompany}".
+  const rawTranscript = transcriptText;
+  const dealTitle = "Sales Demo";
+  const decisionMaker = clientName;
+  const dealValue = "$50,000";
 
-Transcript:
-"""
-${transcriptText}
-"""
+  const prompt = `
+You are an expert sales deal intelligence and conversation analyst.
+Analyze the following sales meeting transcript thoroughly and extract dynamic, accurate insights strictly based ONLY on the spoken content.
 
-Return ONLY a valid JSON object matching EXACTLY this structure (no markdown fences, no explanatory text):
+TRANSCRIPT:
+"${rawTranscript}"
+
+ADDITIONAL CALL METADATA:
+- Meeting Title: ${dealTitle}
+- Client Company: ${clientCompany}
+- Decision Maker: ${decisionMaker}
+- Deal Stage: ${dealStage}
+- Estimated Deal Value: ${dealValue}
+
+OUTPUT REQUIREMENTS:
+Return ONLY a valid, raw JSON object matching the exact schema below (no Markdown fences, no extra commentary):
+
 {
-  "summary": {
-    "executive": "2-3 concise sentences summarizing the meeting outcome, core needs, and next milestone",
-    "keyPoints": ["Bullet 1", "Bullet 2", "Bullet 3", "Bullet 4"],
-    "prospectNeeds": ["Need 1", "Need 2"],
-    "nextStepsSummary": "One sentence summary of agreed next steps"
-  },
+  "summary": "2-3 sentence executive summary explaining what was discussed, key pain points, and outcome.",
+  "buyerIntentScore": 75,
+  "winProbability": 60,
   "sentiment": {
-    "overall": "positive" | "neutral" | "negative",
-    "score": 75, // Integer 0 to 100
-    "breakdown": {
-      "positive": 65,
-      "neutral": 25,
-      "negative": 10
-    },
-    "timeline": [
-      { "minute": 1, "sentimentScore": 60, "topic": "Introductions & Rapport" },
-      { "minute": 5, "sentimentScore": 75, "topic": "Pain Points & Architecture" },
-      { "minute": 12, "sentimentScore": 50, "topic": "Pricing & Budget Questions" },
-      { "minute": 18, "sentimentScore": 85, "topic": "Security & Live Demo" },
-      { "minute": 25, "sentimentScore": 90, "topic": "Next Steps & Trial Rollout" }
-    ]
+    "overall": "Positive",
+    "positivePct": 70,
+    "neutralPct": 20,
+    "negativePct": 10
   },
-  "buyerIntent": {
-    "score": 82, // Integer 0 to 100
-    "level": "High", // "Low" | "Medium" | "High" | "Very High"
-    "winProbability": 78, // Integer 0 to 100
-    "signals": ["Explicitly asked for trial timeline", "Stated current vendor renewal is in 30 days"],
-    "objections": [
-      {
-        "objection": "Concern about 3-week data migration time",
-        "severity": "Medium",
-        "status": "Addressed",
-        "suggestedResponse": "Highlight automated zero-downtime migration connectors and dedicated migration specialist support."
-      }
-    ],
-    "competitorsMentioned": ["LegacyVendor", "CompetitorX"],
-    "budgetDiscussed": true
-  },
-  "actionItems": [
+  "sentimentCurve": [
+    { "timestamp": "0m", "score": 50 },
+    { "timestamp": "2m", "score": 60 },
+    { "timestamp": "4m", "score": 70 },
+    { "timestamp": "End", "score": 80 }
+  ],
+  "dialogue": [
     {
-      "id": "act-1",
-      "task": "Send customized enterprise security architecture whitepaper",
-      "assignee": "Alex Carter (Sales Rep)",
-      "priority": "High",
-      "dueDate": "${new Date(Date.now() + 86400000 * 2).toISOString()}",
-      "completed": false
-    },
-    {
-      "id": "act-2",
-      "task": "Schedule 45-minute technical validation call with VP of Engineering",
-      "assignee": "Sarah Jenkins (Prospect)",
-      "priority": "Medium",
-      "dueDate": "${new Date(Date.now() + 86400000 * 4).toISOString()}",
-      "completed": false
-    },
-    {
-      "id": "act-3",
-      "task": "Provide sandbox API credentials with 10k test event allowance",
-      "assignee": "Alex Carter (Sales Rep)",
-      "priority": "High",
-      "dueDate": "${new Date(Date.now() + 86400000 * 3).toISOString()}",
-      "completed": false
+      "speaker": "Sales Rep",
+      "text": "Exact or cleaned sentence spoken"
     }
   ],
-  "coachingInsights": {
-    "strengths": ["Strong active listening during infrastructure pain points", "Clear articulation of ROI"],
-    "improvements": ["Could probe deeper into budget authorization chain before sharing rate card"],
-    "talkRatio": {
-      "salesRepPercent": 42,
-      "prospectPercent": 58
-    },
-    "dealHealthStatus": "Healthy"
-  },
-  "transcriptTurns": [
+  "actionItems": [
     {
-      "speaker": "Alex Carter",
-      "role": "Sales Rep",
-      "text": "Thanks for taking the time to meet today, Sarah! Excited to walk through how our platform can streamline your sales pipeline.",
-      "timestamp": "00:00",
-      "sentiment": "positive",
-      "intentScore": 60
-    },
-    {
-      "speaker": "Sarah Jenkins",
-      "role": "Prospect",
-      "text": "Great to connect Alex. We are currently evaluating solutions to help our reps analyze calls faster, as our current manual logging is costing us 10 hours a week per rep.",
-      "timestamp": "00:35",
-      "sentiment": "neutral",
-      "intentScore": 75
+      "task": "Specific actionable follow-up task",
+      "assignee": "Sales Rep",
+      "priority": "High"
     }
+  ],
+  "salesCoachingTips": [
+    "Tip on handling objections, talk-to-listen ratio, or pricing discussions."
   ]
-}`;
+}
+`;
 
   // Option 1: Gemini API
   if (geminiClient) {
@@ -304,11 +259,21 @@ function generateSimulatedTranscript(filename = 'meeting_recording.mp3') {
  * Fallback Simulated Intelligence Analysis
  */
 function generateSimulatedAnalysis({ transcriptText = '', clientCompany = 'CloudScale Inc', clientName = 'David Miller', dealStage = 'Demo' }) {
-  const isPositive = transcriptText.toLowerCase().includes('perfect') || transcriptText.toLowerCase().includes('great') || transcriptText.toLowerCase().includes('impressive') || transcriptText.length > 0;
+  const text = transcriptText.toLowerCase();
+  
+  // Calculate dynamic scores based on transcript content
+  let posCount = (text.match(/great|perfect|impressive|excellent|good|yes|agree|awesome/g) || []).length;
+  let negCount = (text.match(/bad|no|disagree|expensive|hard|difficult|issue|bug/g) || []).length;
+  
+  // Generate a predictable but dynamic baseline score based on string length
+  const baseScore = 60 + (text.length % 20); 
+  
+  // Adjust based on sentiment words
+  let sentimentScore = Math.min(99, Math.max(10, baseScore + (posCount * 3) - (negCount * 4)));
+  let buyerIntentScore = Math.min(99, Math.max(10, sentimentScore + (text.length % 7) - 2));
+  let winProb = Math.min(99, Math.max(10, buyerIntentScore - (text.length % 5)));
 
-  const sentimentScore = isPositive ? 82 : 64;
-  const buyerIntentScore = isPositive ? 88 : 70;
-  const winProb = isPositive ? 84 : 68;
+  const isPositive = sentimentScore >= 60;
 
   return {
     summary: {

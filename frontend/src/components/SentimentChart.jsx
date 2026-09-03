@@ -76,9 +76,9 @@ export default function SentimentChart({ sentiment = {}, buyerIntent = {} }) {
               {sentiment.overall ? sentiment.overall.toUpperCase() : 'POSITIVE'}
             </span>
           </div>
-          <div className="w-full bg-dark-800 rounded-full h-2 mt-3 overflow-hidden">
+          <div className="w-full bg-dark-800 rounded-full h-2 mt-3 overflow-hidden relative">
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-brand-500 to-emerald-400"
+              className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-400 transition-all duration-1000 ease-out"
               style={{ width: `${overallScore}%` }}
             ></div>
           </div>
@@ -96,9 +96,9 @@ export default function SentimentChart({ sentiment = {}, buyerIntent = {} }) {
               {buyerIntent.level || 'High'} Intent
             </span>
           </div>
-          <div className="w-full bg-dark-800 rounded-full h-2 mt-3 overflow-hidden">
+          <div className="w-full bg-dark-800 rounded-full h-2 mt-3 overflow-hidden relative">
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-brand-500 to-cyan-400"
+              className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-brand-500 to-cyan-400 transition-all duration-1000 ease-out"
               style={{ width: `${buyerScore}%` }}
             ></div>
           </div>
@@ -116,9 +116,9 @@ export default function SentimentChart({ sentiment = {}, buyerIntent = {} }) {
               {winProb >= 80 ? 'Hot Deal' : winProb >= 60 ? 'High Likelihood' : 'Nurturing'}
             </span>
           </div>
-          <div className="w-full bg-dark-800 rounded-full h-2 mt-3 overflow-hidden">
+          <div className="w-full bg-dark-800 rounded-full h-2 mt-3 overflow-hidden relative">
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-cyan-400 to-brand-400"
+              className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-cyan-400 to-brand-400 transition-all duration-1000 ease-out"
               style={{ width: `${winProb}%` }}
             ></div>
           </div>

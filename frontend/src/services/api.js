@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://127.0.0.1:5000/api',
   timeout: 60000, // 60s timeout for audio AI processing
 });
 
